@@ -1,0 +1,2 @@
+pyyaml
+tkinter  # Optional, only if using GUI
