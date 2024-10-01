@@ -1,2 +1,3 @@
 pyyaml
 tkinter  # Optional, only if using GUI
+requests==2.31.0
