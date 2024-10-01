@@ -23,7 +23,7 @@ The **File Integrity and Virus Checker** is a Python application designed to ens
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/FileIntegrityAndVirusChecker.git
+   git clone https://github.com/Ajinkya259/FileIntegrityAndVirusChecker.git
    cd FileIntegrityAndVirusChecker
 
 2. Install the required packages:
