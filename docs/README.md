@@ -49,13 +49,11 @@ Run the application:
 
 ### Test
 Steps to Test with an Unsafe File
-
-    Identify an Unsafe File:
-    You can find a test file known to contain malware. Websites like EICAR provide a safe test file that antivirus software should detect as malicious. You can use the EICAR test file, which is harmless but mimics the behavior of a virus.
-
-    EICAR Test File Content:X5O!P%@AP[4\PZX54(P^)7CC)7{Q!EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H* 
-
-    Copy the above line into a text file named "eicar.com"
+Identify an Unsafe File:
+You can find a test file known to contain malware. Websites like EICAR provide a safe test file that antivirus software should detect as malicious. You can use the EICAR test file, which is harmless but mimics the behavior of a virus.
+EICAR Test File Content:
+    X5O!P%@AP[4\PZX54(P^)7CC)7{Q!EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H* 
+Copy the above line into a text file named "eicar.com"
 
 
 ### Logging
