@@ -15,7 +15,7 @@ class GUI:
         self.root.geometry("700x500")  # Adjusted window size for better usability
 
         self.integrity_checker = IntegrityChecker()
-        self.file_scanner = FileScanner(api_key="a1c9d5ffd22ed1dc0557cebf6f9451bc7fce4e21947039c670830c5dcd0aeaaa")
+        self.file_scanner = FileScanner(api_key="YOUR_API_KEY")
         self.create_widgets()
 
     def create_widgets(self):
