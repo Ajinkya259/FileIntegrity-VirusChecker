@@ -1,0 +1,12 @@
+# Required for GUI
+tkinter
+
+# Required for encryption
+pycryptodome==3.17  # AES encryption support for the encryption module
+
+# Required for JSON handling, file system access, and hashing
+# Standard Python libraries; included by default, listed for clarity:
+json
+os
+hashlib
+zlib
