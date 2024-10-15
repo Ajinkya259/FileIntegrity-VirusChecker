@@ -29,21 +29,6 @@ cd folder-integrity-checker
     *Encrypt Files*: Select files, provide a password, and encrypt them using the "Encrypt" button. The encrypted files are saved in a secure format.
     *Decrypt Files*: Choose encrypted files, enter the correct password, and click "Decrypt" to restore them to their original state.
 
-## Project Structure
-
-folder-integrity-checker/
-│
-├── checker/
-│   ├── integrity_checker.py       # Integrity checker logic with hybrid hashing
-│   ├── encryption_module.py       # Encryption and decryption functionality
-│   └── baseline.json              # Stores baseline hashes
-│
-├── frontend/
-│   └── gui.py                     # Tkinter-based GUI for the tool
-│
-├── main.py                        # Main file to launch the application
-└── README.md                      # Project documentation
-
 **Hybrid Hashing Algorithm:**
     The tool uses a custom hybrid hashing approach that combines the following algorithms:
 
