@@ -1,0 +1,158 @@
+import os
+import json
+import hashlib
+import zlib
+
+BASELINE_FILE = 'checker/baseline.json'
+
+class IntegrityChecker:
+    def __init__(self):
+        self.baseline = self.load_baseline()
+
+    def load_baseline(self):
+        if os.path.exists(BASELINE_FILE):
+            try:
+                with open(BASELINE_FILE, 'r') as file:
+                    return json.load(file)
+            except json.JSONDecodeError:
+                return {}
+        return {}
+
+    def update_baseline(self, folder_path):
+        baseline = {}
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                baseline[file_path] = self.get_file_hash(file_path)
+        with open(BASELINE_FILE, 'w') as file:
+            json.dump(baseline, file, indent=4)
+        self.baseline = baseline
+        return "Baseline updated."
+
+    def check_integrity(self, folder_path):
+        current_files = {}
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                current_files[file_path] = self.get_file_hash(file_path)
+
+        added_files = [file for file in current_files if file not in self.baseline]
+        deleted_files = [file for file in self.baseline if file not in current_files]
+        modified_files = [
+            file for file in current_files
+            if file in self.baseline and current_files[file] != self.baseline[file]
+        ]
+
+        return {
+            "added_files": added_files,
+            "deleted_files": deleted_files,
+            "modified_files": modified_files,
+        }
+    @staticmethod
+    def get_file_hash(file_path):
+        crc32_hash = 0
+        md5_hash = IntegrityChecker.md5()
+        sha256_hash = hashlib.sha256()
+        blake2b_hash = hashlib.blake2b(digest_size=32)  
+
+        with open(file_path, 'rb') as file:
+            while chunk := file.read(4096):
+                crc32_hash = zlib.crc32(chunk, crc32_hash)
+                md5_hash.update(chunk)
+                sha256_hash.update(chunk)
+                blake2b_hash.update(chunk)
+
+        crc32_result = f"{crc32_hash:08x}"  
+        md5_result = md5_hash.hexdigest()
+        sha256_result = sha256_hash.hexdigest()
+        blake2b_result = blake2b_hash.hexdigest()
+
+        print(f"CRC32 Hash: {crc32_result}")
+        print(f"MD5 Hash: {md5_result}")
+        print(f"SHA-256 Hash: {sha256_result}")
+        print(f"Blake2b Hash: {blake2b_result}")
+
+        hybrid_hash = (
+            crc32_result +         
+            md5_result +         
+            sha256_result +      
+            blake2b_result       
+        )
+        
+        print(f"Hybrid Hash: {hybrid_hash}")
+
+        return hybrid_hash
+
+    @staticmethod
+    def md5():
+        # Initialize MD5 state
+        class MD5:
+            def __init__(self):
+                self.state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+                self.count = 0
+                self.buffer = bytearray()
+
+            def update(self, data):
+                self.buffer.extend(data)
+                self.count += len(data) * 8
+                while len(self.buffer) >= 64:
+                    self._process_chunk(self.buffer[:64])
+                    self.buffer = self.buffer[64:]
+
+            def _process_chunk(self, chunk):
+                # Prepare the message for processing
+                a, b, c, d = self.state
+                # Decode the chunk into 16 32-bit words
+                M = [0] * 16
+                for i in range(16):
+                    M[i] = int.from_bytes(chunk[i*4:(i+1)*4], 'little')
+
+                # Main loop
+                for i in range(64):
+                    if i < 16:
+                        f = (b & c) | (~b & d)
+                        g = i
+                    elif i < 32:
+                        f = (d & b) | (~d & c)
+                        g = (5 * i + 1) % 16
+                    elif i < 48:
+                        f = b ^ c ^ d
+                        g = (3 * i + 5) % 16
+                    else:
+                        f = c ^ (b | ~d)
+                        g = (7 * i) % 16
+
+                    f = (f + a + K[i] + M[g]) & 0xFFFFFFFF
+                    a, d, c, b = d, (b + ((f << S[i]) | (f >> (32 - S[i])))) & 0xFFFFFFFF, b, (b + ((f << S[i]) | (f >> (32 - S[i]))) & 0xFFFFFFFF)
+
+                # Add the compressed chunk to the current state
+                self.state = [(x + y) & 0xFFFFFFFF for x, y in zip(self.state, [a, b, c, d])]
+
+            def hexdigest(self):
+                # Padding the final bits
+                final_count = self.count
+                self.buffer.append(0x80)  # Add a single '1' bit
+                while (len(self.buffer) % 64) != 56:
+                    self.buffer.append(0)  # Add '0' bits
+                self.buffer.extend(final_count.to_bytes(8, 'little'))  # Append the length
+
+                # Process remaining buffer
+                while len(self.buffer) >= 64:
+                    self._process_chunk(self.buffer[:64])
+                    self.buffer = self.buffer[64:]
+
+                # Produce final digest
+                return ''.join(f'{x:02x}' for x in self._get_digest())
+
+            def _get_digest(self):
+                # Produce the final hash
+                return [item for sublist in self.state for item in sublist.to_bytes(4, 'little')]
+
+        return MD5()
+
+
+# Constants used in MD5
+K = [(int((2**32) * abs(math.sin(i + 1))) & 0xFFFFFFFF) for i in range(64)]
+S = [7, 12, 17, 22] * 4
+
+
