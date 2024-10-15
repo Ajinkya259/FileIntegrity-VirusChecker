@@ -52,10 +52,13 @@ folder-integrity-checker/
 3. SHA-256: A secure cryptographic hash.
 4. Blake2b: A modern, high-performance cryptographic hash.
     The combination ensures both speed and reliability in integrity checking.
+
 **Encryption and Decryption Module**
     This module allows users to encrypt files with a password and decrypt them as needed. It uses AES-256 encryption to secure sensitive data, making sure files are accessible only to those with the correct password.
+
 **Contributing**
 Feel free to submit issues or pull requests. Contributions are welcome!
+
 **License**
 This project is licensed under the MIT License.
 
